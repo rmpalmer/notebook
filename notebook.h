@@ -18,6 +18,8 @@ public slots:
     void addNote();
     void submitNote();
     void cancel();
+    void next();
+    void previous();
 
 private:
     QMap<QString,QString> content;

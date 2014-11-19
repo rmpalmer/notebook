@@ -1,6 +1,7 @@
 #include <QtGui>
 #include "notebook.h"
 #include "ui_notebook.h"
+#include <iostream>
 
 Notebook::Notebook(QWidget *parent) :
     QWidget(parent)
@@ -10,14 +11,19 @@ Notebook::Notebook(QWidget *parent) :
     contentText->setReadOnly(true);
     cancelButton->hide();
     submitButton->hide();
+    nextButton->setEnabled(false);
+    previousButton->setEnabled(false);
     connect(addButton, SIGNAL(clicked()), this, SLOT(addNote()));
     connect(submitButton, SIGNAL(clicked()), this, SLOT(submitNote()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancel()));
-
+    connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
+    connect(previousButton, SIGNAL(clicked()), this, SLOT(previous()));
 }
 
 void Notebook::addNote()
 {
+    nextButton->setEnabled(false);
+    previousButton->setEnabled(false);
     oldTitle = titleLine->text();
     oldContent = contentText->toPlainText();
 
@@ -59,6 +65,9 @@ void Notebook::submitNote()
     addButton->setEnabled(true);
     submitButton->hide();
     cancelButton->hide();
+    int number = content.size();
+    nextButton->setEnabled(number > 1);
+    previousButton->setEnabled(number > 1);
 }
 
 void Notebook::cancel()
@@ -73,4 +82,37 @@ void Notebook::cancel()
     submitButton->hide();
     cancelButton->hide();
 
+    int number = content.size();
+    nextButton->setEnabled(number > 1);
+    previousButton->setEnabled(number > 1);
+}
+
+void Notebook::next()
+{
+    QString title = titleLine->text();
+    QMap<QString,QString>::iterator i = content.find(title);
+    if (i != content.end())
+        i++;
+    if (i == content.end())
+        i = content.begin();
+    titleLine->setText(i.key());
+    contentText->setText(i.value());
+}
+
+void Notebook::previous()
+{
+    QString title = titleLine->text();
+    QMap<QString,QString>::iterator i = content.find(title);
+    if (i == content.end()) {
+        titleLine->clear();
+        contentText->clear();
+        return;
+    }
+
+    if (i == content.begin())
+        i = content.end();
+
+    i--;
+    titleLine->setText(i.key());
+    contentText->setText(i.value());
 }
