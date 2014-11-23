@@ -13,30 +13,26 @@ Notebook::Notebook(QWidget *parent) :
     submitButton->hide();
     nextButton->setEnabled(false);
     previousButton->setEnabled(false);
+    editButton->setEnabled(false);
+    removeButton->setEnabled(false);
     connect(addButton, SIGNAL(clicked()), this, SLOT(addNote()));
     connect(submitButton, SIGNAL(clicked()), this, SLOT(submitNote()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancel()));
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(previousButton, SIGNAL(clicked()), this, SLOT(previous()));
+    connect(editButton, SIGNAL(clicked()), this, SLOT(editContent()));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeContent()));
 }
 
 void Notebook::addNote()
 {
-    nextButton->setEnabled(false);
-    previousButton->setEnabled(false);
     oldTitle = titleLine->text();
     oldContent = contentText->toPlainText();
 
     titleLine->clear();
     contentText->clear();
 
-    titleLine->setReadOnly(false);
-    titleLine->setFocus(Qt::OtherFocusReason);
-    contentText->setReadOnly(false);
-
-    addButton->setEnabled(false);
-    submitButton->show();
-    cancelButton->show();
+    updateInterface(AddingMode);
 }
 
 void Notebook::submitNote()
@@ -45,46 +41,48 @@ void Notebook::submitNote()
     QString newContent = contentText->toPlainText();
 
     if (title.isEmpty() || newContent.isEmpty()) {
-        QMessageBox::information(this, tr("Empty Field"), tr("Please enter a title and content"));
+        QMessageBox::information(this, tr("Empty Field"),
+            tr("Please enter a title and content."));
         return;
     }
+    if (currentMode == AddingMode) {
 
-    if (!content.contains(title)) {
-        content.insert(title, newContent);
-        QMessageBox::information(this, tr("Add Successful"),tr("\"%1\" has been added to your notebook.").arg(title));
-    } else {
-        QMessageBox::information(this, tr("Add Unsuccessful"),tr("\%1\" is already in your notebook.").arg(title));
+        if (!content.contains(title)) {
+            content.insert(title, newContent);
+            QMessageBox::information(this, tr("Add Successful"),
+                tr("\"%1\" has been added to your notebook.").arg(title));
+        } else {
+            QMessageBox::information(this, tr("Add Unsuccessful"),
+                tr("Sorry, \"%1\" is already in your notebook.").arg(title));
+        }
+    } else if (currentMode == EditingMode) {
+
+        if (oldTitle != title) {
+            if (!content.contains(title)) {
+                QMessageBox::information(this, tr("Edit Successful"),
+                    tr("\"%1\" has been edited in your notebook.").arg(oldTitle));
+                content.remove(oldTitle);
+                content.insert(title, newContent);
+            } else {
+                QMessageBox::information(this, tr("Edit Unsuccessful"),
+                    tr("Sorry, \"%1\" is already in your notebook.").arg(title));
+            }
+        } else if (oldContent != newContent) {
+            QMessageBox::information(this, tr("Edit Successful"),
+                tr("\"%1\" has been edited in your notebook.").arg(title));
+            content[title] = newContent;
+        }
     }
 
-    if (content.isEmpty()) {
-       titleLine->clear();
-       contentText->clear();
-    }
-    titleLine->setReadOnly(true);
-    contentText->setReadOnly(true);
-    addButton->setEnabled(true);
-    submitButton->hide();
-    cancelButton->hide();
-    int number = content.size();
-    nextButton->setEnabled(number > 1);
-    previousButton->setEnabled(number > 1);
+    updateInterface(NavigationMode);
+
 }
 
 void Notebook::cancel()
 {
     titleLine->setText(oldTitle);
-    titleLine->setReadOnly(true);
-
     contentText->setText(oldContent);
-    contentText->setReadOnly(true);
-
-    addButton->setEnabled(true);
-    submitButton->hide();
-    cancelButton->hide();
-
-    int number = content.size();
-    nextButton->setEnabled(number > 1);
-    previousButton->setEnabled(number > 1);
+    updateInterface(NavigationMode);
 }
 
 void Notebook::next()
@@ -116,3 +114,102 @@ void Notebook::previous()
     titleLine->setText(i.key());
     contentText->setText(i.value());
 }
+
+void Notebook::editContent()
+{
+    oldTitle = titleLine->text();
+    oldContent = contentText->toPlainText();
+
+    updateInterface(EditingMode);
+}
+
+void Notebook::removeContent()
+{
+    QString title = titleLine->text();
+    QString theContent = contentText->toPlainText();
+
+    if (content.contains(title)) {
+        int button = QMessageBox::question(this,
+                       tr("Confirm Remove"),
+                       tr("Are you Sure you want to remove \"%1\"?").arg(title),
+                       QMessageBox::Yes | QMessageBox::No);
+        if (button == QMessageBox::Yes) {
+            previous();
+            content.remove(title);
+            QMessageBox::information(this, tr("Remove Successful"),
+                       tr("\"%1\" has been removed from your notebook.").arg(title));
+        }
+
+    }
+    updateInterface(NavigationMode);
+
+}
+
+void Notebook::updateInterface(Mode mode)
+{
+    currentMode = mode;
+
+    switch (currentMode) {
+    case AddingMode:
+    case EditingMode:
+        titleLine->setReadOnly(false);
+        titleLine->setFocus(Qt::OtherFocusReason);
+        contentText->setReadOnly(false);
+
+        addButton->setEnabled(false);
+        editButton->setEnabled(false);
+        removeButton->setEnabled(false);
+
+        nextButton->setEnabled(false);
+        previousButton->setEnabled(false);
+
+        submitButton->show();
+        cancelButton->show();
+        break;
+    case NavigationMode:
+        if (content.isEmpty()) {
+            titleLine->clear();
+            contentText->clear();
+        }
+        titleLine->setReadOnly(true);
+        contentText->setReadOnly(true);
+        addButton->setEnabled(true);
+
+        int number = content.size();
+        editButton->setEnabled(number >= 1);
+        removeButton->setEnabled(number >= 1);
+        nextButton->setEnabled(number > 1);
+        previousButton->setEnabled(number > 1);
+
+        submitButton->hide();
+        cancelButton->hide();
+        break;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

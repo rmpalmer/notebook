@@ -13,6 +13,7 @@ class Notebook : public QWidget, public Ui::Notebook
 
 public:
     explicit Notebook(QWidget *parent = 0);
+    enum Mode {NavigationMode, AddingMode, EditingMode};
 
 public slots:
     void addNote();
@@ -20,8 +21,13 @@ public slots:
     void cancel();
     void next();
     void previous();
+    void editContent();
+    void removeContent();
 
 private:
+    void updateInterface(Mode mode);
+
+    Mode currentMode;
     QMap<QString,QString> content;
     QString oldTitle;
     QString oldContent;
