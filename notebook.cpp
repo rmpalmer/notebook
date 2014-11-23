@@ -26,6 +26,8 @@ Notebook::Notebook(QWidget *parent) :
     connect(editButton, SIGNAL(clicked()), this, SLOT(editContent()));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(removeContent()));
     connect(findButton, SIGNAL(clicked()), this, SLOT(findTitle()));
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveToFile()));
+    connect(loadButton, SIGNAL(clicked()), this, SLOT(loadFromFile()));
 }
 
 void Notebook::addNote()
@@ -210,9 +212,61 @@ void Notebook::findTitle()
     updateInterface(NavigationMode);
 }
 
+void Notebook::saveToFile()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+          tr("Save Notebook"), "",
+          tr("Notebook (*.nbk);;All Files (*)"));
 
+    if (fileName.isEmpty())
+        return;
+    else {
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(this,tr("Unable to open file"),
+               file.errorString());
+            return;
+        }
+        QDataStream out(&file);
+        out.setVersion(QDataStream::Qt_4_8);
+        out << content;
+    }
+}
 
+void Notebook::loadFromFile()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+       tr("Open Notebook"), "",
+       tr("Notebook (*.nbk);;All Files(*)"));
 
+    if (fileName.isEmpty())
+        return;
+    else {
+        QFile file(fileName);
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(this,tr("Unable to open file"),
+               file.errorString());
+            return;
+        }
+
+        QDataStream in (&file);
+        in.setVersion(QDataStream::Qt_4_8);
+        content.empty();
+        in >> content;
+
+        if (content.isEmpty()) {
+            QMessageBox::information(this, tr("No content to save"),
+                                     tr("The file has no content"));
+        } else {
+            QMap<QString,QString>::iterator i = content.begin();
+            titleLine->setText(i.key());
+            contentText->setText(i.value());
+        }
+    }
+    updateInterface(NavigationMode);
+
+}
 
 
 

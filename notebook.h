@@ -25,6 +25,8 @@ public slots:
     void editContent();
     void removeContent();
     void findTitle();
+    void saveToFile();
+    void loadFromFile();
 
 private:
     void updateInterface(Mode mode);

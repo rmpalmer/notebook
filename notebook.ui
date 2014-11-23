@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>412</width>
-    <height>300</height>
+    <height>347</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
      <x>67</x>
      <y>38</y>
      <width>256</width>
-     <height>192</height>
+     <height>241</height>
     </rect>
    </property>
   </widget>
@@ -102,7 +102,7 @@
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>240</y>
+     <y>290</y>
      <width>80</width>
      <height>23</height>
     </rect>
@@ -115,7 +115,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>240</y>
+     <y>290</y>
      <width>80</width>
      <height>23</height>
     </rect>
@@ -159,8 +159,43 @@
      <height>23</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Find in title field</string>
+   </property>
    <property name="text">
     <string>Find</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadButton">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>220</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Load Content from File</string>
+   </property>
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="saveButton">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>250</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Save Content to File</string>
+   </property>
+   <property name="text">
+    <string>Save</string>
    </property>
   </widget>
  </widget>
