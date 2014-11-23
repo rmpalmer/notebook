@@ -15,6 +15,9 @@ Notebook::Notebook(QWidget *parent) :
     previousButton->setEnabled(false);
     editButton->setEnabled(false);
     removeButton->setEnabled(false);
+
+    dialog = new FindDialog;
+
     connect(addButton, SIGNAL(clicked()), this, SLOT(addNote()));
     connect(submitButton, SIGNAL(clicked()), this, SLOT(submitNote()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancel()));
@@ -22,6 +25,7 @@ Notebook::Notebook(QWidget *parent) :
     connect(previousButton, SIGNAL(clicked()), this, SLOT(previous()));
     connect(editButton, SIGNAL(clicked()), this, SLOT(editContent()));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(removeContent()));
+    connect(findButton, SIGNAL(clicked()), this, SLOT(findTitle()));
 }
 
 void Notebook::addNote()
@@ -187,7 +191,24 @@ void Notebook::updateInterface(Mode mode)
     }
 }
 
+void Notebook::findTitle()
+{
+    dialog->show();
 
+    if (dialog->exec() == QDialog::Accepted) {
+        QString titleName = dialog->getFindText();
+
+        if (content.contains(titleName)) {
+            titleLine->setText(titleName);
+            contentText->setText(content.value(titleName));
+        } else {
+            QMessageBox::information(this, tr("Title Nof found"),
+              tr("Sorry, \%1\" is not in your notebook.").arg(titleName));
+            return;
+        }
+    }
+    updateInterface(NavigationMode);
+}
 
 
 

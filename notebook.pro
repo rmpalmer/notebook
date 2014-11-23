@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        notebook.cpp
+        notebook.cpp \
+    finddialog.cpp
 
-HEADERS  += notebook.h
+HEADERS  += notebook.h \
+    finddialog.h
 
-FORMS    += notebook.ui
+FORMS    += notebook.ui \
+    finddialog.ui

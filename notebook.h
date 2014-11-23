@@ -6,6 +6,7 @@
 #include <QString>
 
 #include "ui_notebook.h"
+#include "finddialog.h"
 
 class Notebook : public QWidget, public Ui::Notebook
 {
@@ -23,6 +24,7 @@ public slots:
     void previous();
     void editContent();
     void removeContent();
+    void findTitle();
 
 private:
     void updateInterface(Mode mode);
@@ -31,6 +33,7 @@ private:
     QMap<QString,QString> content;
     QString oldTitle;
     QString oldContent;
+    FindDialog *dialog;
 
 };
 
